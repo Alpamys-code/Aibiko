@@ -1,0 +1,179 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a0a;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Layer 1: Photos - masonry brick layout */
+.photos-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 180px;
+  gap: 4px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.photos-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: none;
+  outline: none;
+  /* no frames */
+}
+
+/* Make some taller for brick effect */
+.photos-layer img:nth-child(3n) {
+  grid-row: span 2;
+}
+
+.photos-layer img:nth-child(5n) {
+  grid-row: span 2;
+}
+
+.photos-layer img:nth-child(7n) {
+  grid-column: span 2;
+}
+
+/* Layer 2: Frosted glass - slight blur */
+.glass-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+/* Layer 3: Lyrics */
+.lyrics-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.lyrics-container {
+  text-align: center;
+  max-width: 900px;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(255,105,180,0.4);
+}
+
+.lyrics-container .line {
+  font-size: clamp(1.4rem, 4vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 8px 0;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateY(30px);
+}
+
+.lyrics-container .line.active {
+  opacity: 1;
+  transform: translateY(-50%) translateY(0);
+}
+
+.lyrics-container .line.fade-out {
+  opacity: 0;
+  transform: translateY(-50%) translateY(-30px);
+}
+
+/* Play overlay */
+.play-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.play-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.play-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform 0.3s ease, background 0.3s;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.play-circle:hover {
+  transform: scale(1.08);
+  background: rgba(255,105,180,0.25);
+}
+
+.play-circle span {
+  font-size: 3rem;
+  margin-bottom: 8px;
+}
+
+.play-circle p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .photos-layer {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-auto-rows: 140px;
+  }
+  
+  .lyrics-container .line {
+    font-size: 1.3rem;
+    padding: 0 10px;
+  }
+}
