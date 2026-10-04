@@ -4,7 +4,190 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Бике 💕</title>
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a0a;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Layer 1: Photos - masonry brick layout */
+.photos-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 180px;
+  gap: 4px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.photos-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: none;
+  outline: none;
+}
+
+/* Make some taller for brick effect */
+.photos-layer img:nth-child(3n) {
+  grid-row: span 2;
+}
+
+.photos-layer img:nth-child(5n) {
+  grid-row: span 2;
+}
+
+.photos-layer img:nth-child(7n) {
+  grid-column: span 2;
+}
+
+/* Layer 2: Frosted glass - slight blur */
+.glass-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+/* Layer 3: Lyrics */
+.lyrics-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.lyrics-container {
+  text-align: center;
+  max-width: 900px;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(255,105,180,0.4);
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.lyrics-container .line {
+  font-size: clamp(1.4rem, 4vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 8px 0;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateY(30px);
+  padding: 0 15px;
+}
+
+.lyrics-container .line.active {
+  opacity: 1;
+  transform: translateY(-50%) translateY(0);
+}
+
+.lyrics-container .line.fade-out {
+  opacity: 0;
+  transform: translateY(-50%) translateY(-30px);
+}
+
+/* Play overlay */
+.play-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.play-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.play-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform 0.3s ease, background 0.3s;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.play-circle:hover {
+  transform: scale(1.08);
+  background: rgba(255,105,180,0.25);
+}
+
+.play-circle span {
+  font-size: 3rem;
+  margin-bottom: 8px;
+}
+
+.play-circle p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .photos-layer {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-auto-rows: 140px;
+  }
+  
+  .lyrics-container .line {
+    font-size: 1.3rem;
+    padding: 0 10px;
+  }
+}
+  </style>
 </head>
 <body>
   <!-- Layer 1: Photos masonry -->
@@ -67,6 +250,93 @@
     </div>
   </div>
 
-  <script src="js/main.js"></script>
+  <script>
+// Load all photos into masonry
+const photosContainer = document.getElementById('photos');
+const totalPhotos = 45;
+
+// Shuffle for more organic look
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+const photoNums = shuffle([...Array(totalPhotos).keys()].map(i => i + 1));
+
+photoNums.forEach(num => {
+  const img = document.createElement('img');
+  const padded = String(num).padStart(2, '0');
+  img.src = `photos/photo-${padded}.jpg`;
+  img.alt = `photo ${num}`;
+  img.loading = 'lazy';
+  photosContainer.appendChild(img);
+});
+
+// Audio + lyrics sync
+const audio = document.getElementById('song');
+const playBtn = document.getElementById('playBtn');
+const lines = document.querySelectorAll('.lyrics-container .line');
+
+let currentLine = -1;
+
+function updateLyrics() {
+  const t = audio.currentTime;
+  
+  // Find the active line
+  let activeIdx = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const lineTime = parseFloat(lines[i].dataset.time);
+    if (t >= lineTime) {
+      activeIdx = i;
+      break;
+    }
+  }
+  
+  if (activeIdx !== currentLine) {
+    // Fade out previous
+    if (currentLine >= 0) {
+      lines[currentLine].classList.remove('active');
+      lines[currentLine].classList.add('fade-out');
+    }
+    
+    // Activate new
+    if (activeIdx >= 0) {
+      lines[activeIdx].classList.remove('fade-out');
+      lines[activeIdx].classList.add('active');
+    }
+    
+    currentLine = activeIdx;
+  }
+}
+
+// Play button (browsers block autoplay)
+playBtn.addEventListener('click', () => {
+  audio.play().then(() => {
+    playBtn.classList.add('hidden');
+    // Start lyrics updater
+    setInterval(updateLyrics, 200);
+  }).catch(err => {
+    console.log('Play failed:', err);
+  });
+});
+
+// Also allow spacebar
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !playBtn.classList.contains('hidden')) {
+    playBtn.click();
+  }
+});
+
+// Optional: restart lyrics on loop
+audio.addEventListener('ended', () => {
+  currentLine = -1;
+  lines.forEach(l => {
+    l.classList.remove('active', 'fade-out');
+  });
+});
+  </script>
 </body>
 </html>
